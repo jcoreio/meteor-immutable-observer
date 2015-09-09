@@ -1,0 +1,38 @@
+{
+  "name": "meteor-seamless-immutable-cursor",
+  "version": "0.0.1",
+  "description": "Creates and auto-updates seamless-immutable arrays from Meteor Collection cursors",
+  "main": "lib/index",
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jedwards1211/meteor-seamless-immutable-cursor"
+  },
+  "keywords": [
+    "meteor",
+    "immutable",
+    "seamless-immutable",
+    "cursor",
+    "collection",
+    "mongo"
+  ],
+  "author": "Andy Edwards",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jedwards1211/meteor-seamless-immutable-cursor/issues"
+  },
+  "homepage": "https://github.com/jedwards1211/meteor-seamless-immutable-cursor",
+  "peerDependencies": {
+    "seamless-immutable": "^3.0.0"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.23",
+    "babel-loader": "^5.3.2",
+    "seamless-immutable": "^3.0.0",
+    "webpack": "^1.12.1"
+  }
+}
