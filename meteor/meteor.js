@@ -1,23 +1,19 @@
-if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
+// Set up a collection to contain player information. On the server,
+// it is backed by a MongoDB collection named "players".
 
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get('counter');
-    }
-  });
+Players = new Meteor.Collection("players");
 
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
-}
-
+// On server startup, create some players if the database is empty.
 if (Meteor.isServer) {
+  Meteor.methods({
+    clearPlayers: function() {
+      Players.remove({});
+    }
+  });
+
   Meteor.startup(function () {
-    // code to run on server at startup
+    Meteor.publish('players', function(){
+      return Players.find();
+    });
   });
 }

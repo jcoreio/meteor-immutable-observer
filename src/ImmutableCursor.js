@@ -1,7 +1,7 @@
 import Immutable from 'seamless-immutable';
 
 export default function ImmutableCursor(cursor) {
-  let immutable = Immutable([]);
+  let immutable = Immutable(cursor.fetch());
   let dep = new Tracker.Dependency();
   let observers = [];
   let handle;
@@ -22,6 +22,7 @@ export default function ImmutableCursor(cursor) {
   }
 
   function observe() {
+    update(Immutable(cursor.fetch()));
     handle = cursor.observe({
       addedAt: (document, atIndex, before) => {
         if (atIndex === immutable.length) {
@@ -56,21 +57,18 @@ export default function ImmutableCursor(cursor) {
 
   return {
     forEach(...args) {
-      if (!handle) observe();
-      dep.depend();
+      if (dep.depend() && !handle) observe();
       return immutable.forEach(...args);
     },
     map(...args) {
-      if (!handle) observe();
-      dep.depend();
+      if (dep.depend() && !handle) observe();
       return immutable.map(...args);
     },
     count() {
       return cursor.count();
     },
     fetch() {
-      if (!handle) observe();
-      dep.depend();
+      if (dep.depend() && !handle) observe();
       return immutable; 
     },
     observe(callback) {

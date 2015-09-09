@@ -54,18 +54,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	var global = (function() { return this; })();
+	global.ImmutableCursor = __webpack_require__(1);
 
-	exports.__esModule = true;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _ImmutableCursor = __webpack_require__(1);
-
-	var _ImmutableCursor2 = _interopRequireDefault(_ImmutableCursor);
-
-	exports['default'] = _ImmutableCursor2['default'];
-	module.exports = exports['default'];
 
 /***/ },
 /* 1 */

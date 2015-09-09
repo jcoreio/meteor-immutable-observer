@@ -5,5 +5,7 @@
 # but you can also edit it by hand.
 
 meteor-platform
-autopublish
 insecure
+jedwards1211:seamless-immutable-cursor
+sanjo:jasmine
+velocity:html-reporter
