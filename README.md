@@ -52,10 +52,16 @@ class PostList extends React.Component {
 
 export default React.createClass({
   mixins: [ReactMeteorData], 
+  componentWillMount() {
+    this.postsCursor = ImmutableCursor(Posts.find());
+  }
+  componentWillUnmount() {
+    this.postsCursor.stop();
+  }
   getMeteorData() {
     Meteor.subscribe('posts');
     return {
-      posts: ImmutableCursor(Posts.find()).fetch(),
+      posts: postsCursor.fetch(),
     };
   },
   render() {

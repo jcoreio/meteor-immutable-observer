@@ -15,3 +15,12 @@ Package.onUse(function(api) {
   api.use('dataflows:immutable@3.6.2')
   api.addFiles('global-meteor-immutable-cursor.js');
 });
+
+Package.onTest(function(api) {
+  api.use('sanjo:jasmine@0.18.0');
+  api.use('dataflows:immutable@3.6.2')
+  api.use('insecure');
+  api.addFiles('global-meteor-immutable-cursor.js');
+  api.addFiles('tests/Players.js');
+  api.addFiles('tests/client/ImmutableCursorSpec.js', 'client');
+});

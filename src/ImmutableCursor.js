@@ -2,75 +2,77 @@ import Immutable from 'immutable';
 
 import updateDeep from './updateDeep';
 
+function mergeChanges(document, fields) {
+  return document.withMutations(document => {
+    for (var key in fields) {
+      if (fields.hasOwnProperty(key)) {
+        var newValue = fields[key];
+        if (newValue === undefined) {
+          document.delete(key);
+        }
+        else {
+          document.update(key, oldValue => updateDeep(oldValue, Immutable.fromJS(newValue)));
+        }
+      }
+    }
+  });
+}
+
 export default function ImmutableCursor(cursor) {
-  let documents = Immutable.fromJS(cursor.fetch());
+  let documents;
   let dep = new Tracker.Dependency();
-  let observers = [];
-  let handle;
 
   function update(newDocuments) {
     let oldDocuments = documents;
     documents = newDocuments;
-    dep.changed();
-    observers.forEach(observer => observer(newDocuments, oldDocuments));
-    stopObservingIfUnncessary();
+    if (oldDocuments !== newDocuments) dep.changed();
   }
 
-  function stopObservingIfUnncessary() {
-    if (handle && !dep.hasDependents() && !observers.length) {
+  let initialDocuments = {};
+  let handle = cursor.observeChanges({
+    added: (id, fields) => {
+      fields._id = id;
+      if (documents) {
+        update(documents.set(id, Immutable.fromJS(fields)));
+      }
+      else {
+        initialDocuments[id] = fields;
+      }
+    },
+    changed: (id, fields) => {
+      update(documents.update(id, document => mergeChanges(document, fields)));
+    },
+    removed: (id) => {
+      update(documents.delete(id));
+    },
+  });
+  documents = Immutable.OrderedMap(initialDocuments);
+  initialDocuments = undefined;
+
+  if (Tracker.active) {
+    Tracker.onInvalidate(() => {
       handle.stop();
-      handle = undefined;
-    }
-  }
-
-  function observe() {
-    update(Immutable.fromJS(cursor.fetch()));
-    handle = cursor.observe({
-      addedAt: (document, atIndex, before) => {
-        update(documents.splice(atIndex, 0, Immutable.fromJS(document)));
-      },
-      changedAt: (newDocument, oldDocument, atIndex) => {
-        update(documents.update(atIndex, 
-          oldDocument => updateDeep(oldDocument, Immutable.fromJS(newDocument))));
-      },
-      removedAt: (oldDocument, atIndex) => {
-        update(documents.splice(atIndex, 1));
-      },
-      movedTo: (document, fromIndex, toIndex, before) => {
-        var immDocument = documents.get(fromIndex);
-        update(documents.delete(fromIndex).splice(toIndex, 0, immDocument));
-      },
     });
   }
 
   return {
     forEach(...args) {
-      if (dep.depend() && !handle) observe();
+      dep.depend();
       return documents.forEach(...args);
     },
     map(...args) {
-      if (dep.depend() && !handle) observe();
+      dep.depend();
       return documents.map(...args);
     },
     count() {
       return cursor.count();
     },
     fetch() {
-      if (dep.depend() && !handle) observe();
+      dep.depend();
       return documents; 
     },
-    observe(callback) {
-      if (!handle) observe();
-      observers.push(callback);
-      return {
-        stop() {
-          let index = observers.indexOf(callback);
-          if (index >= 0) {
-            observers.splice(index, 1);
-            stopObservingIfUnncessary();
-          }
-        },
-      };
-    },
+    stop() {
+      handle.stop();
+    }
   };
 }
