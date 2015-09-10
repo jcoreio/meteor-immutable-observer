@@ -1,16 +1,16 @@
-describe('ImmutableCursor', function() {
+describe('ImmutableObserver', function() {
   it('basic test', function(done) {
     var failTimeout = setTimeout(done.fail, 5000);
-    var cursor = ImmutableCursor(Players.find({name: 'Andy', score: {$gt: 1000000}})); 
+    var observer = ImmutableObserver(Players.find({name: 'Andy', score: {$gt: 1000000}})); 
 
     var origDone = done;
     done = function() {
-      cursor.stop();
+      observer.stop();
       clearTimeout(failTimeout);
       origDone();
     }
     done.fail = function(msg) {
-      cursor.stop();
+      observer.stop();
       clearTimeout(failTimeout);
       origDone.fail(msg);
     }
@@ -18,8 +18,8 @@ describe('ImmutableCursor', function() {
     Meteor.call('clearPlayers');
     var comp = Tracker.autorun(function() {
       Meteor.subscribe('players');
-      console.log(JSON.stringify(cursor.fetch().toJS(), null, "  "));
-      if (cursor.fetch().size) {
+      console.log(JSON.stringify(observer.documents().toJS(), null, "  "));
+      if (observer.documents().size) {
         done();
       }
     });

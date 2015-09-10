@@ -3,7 +3,7 @@ var webpack = require('webpack');
 module.exports = {
 
   output: {
-    library: 'meteor-immutable-cursor',
+    library: 'meteor-immutable-observer',
     libraryTarget: 'umd'
   },
 
@@ -20,7 +20,7 @@ module.exports = {
 
   module: {
     loaders: [
-      { test: /\.js$/, exclude: /node_modules|setGlobalImmutableCursor\.js/, loader: 'babel?loose=all' }
+      { test: /\.js$/, exclude: /node_modules|setGlobalImmutableObserver\.js/, loader: 'babel?loose=all' }
     ]
   },
 

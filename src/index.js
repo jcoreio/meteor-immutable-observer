@@ -1,1 +1,1 @@
-export default from './ImmutableCursor';
+export default from './ImmutableObserver';

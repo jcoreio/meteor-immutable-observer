@@ -1,7 +1,7 @@
 {
-  "name": "meteor-immutable-cursor",
+  "name": "meteor-immutable-observer",
   "version": "0.0.1",
-  "description": "Creates and auto-updates Immutable.js arrays from Meteor Collection cursors",
+  "description": "Creates and auto-updates Immutable.js collections from Meteor Collection cursors",
   "main": "lib/index",
   "scripts": {
     "build": "./scripts/build.sh",
@@ -9,22 +9,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jedwards1211/meteor-immutable-cursor"
+    "url": "https://github.com/jedwards1211/meteor-immutable-observer"
   },
   "keywords": [
     "meteor",
     "immutable",
     "immutablejs",
-    "cursor",
+    "observer",
     "collection",
     "mongo"
   ],
   "author": "Andy Edwards",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jedwards1211/meteor-immutable-cursor/issues"
+    "url": "https://github.com/jedwards1211/meteor-immutable-observer/issues"
   },
-  "homepage": "https://github.com/jedwards1211/meteor-immutable-cursor",
+  "homepage": "https://github.com/jedwards1211/meteor-immutable-observer",
   "peerDependencies": {
     "immutable": "^3.7.5"
   },

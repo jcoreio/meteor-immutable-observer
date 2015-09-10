@@ -18,7 +18,7 @@ function mergeChanges(document, fields) {
   });
 }
 
-export default function ImmutableCursor(cursor) {
+export default function ImmutableObserver(cursor) {
   let documents;
   let dep = new Tracker.Dependency();
 
@@ -56,18 +56,7 @@ export default function ImmutableCursor(cursor) {
   }
 
   return {
-    forEach(...args) {
-      dep.depend();
-      return documents.forEach(...args);
-    },
-    map(...args) {
-      dep.depend();
-      return documents.map(...args);
-    },
-    count() {
-      return cursor.count();
-    },
-    fetch() {
+    documents() {
       dep.depend();
       return documents; 
     },
