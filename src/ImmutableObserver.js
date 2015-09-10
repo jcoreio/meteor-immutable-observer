@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 
+import LinkedMap from './LinkedMap';
 import updateDeep from './updateDeep';
 
 function mergeChanges(document, fields) {
@@ -19,35 +20,38 @@ function mergeChanges(document, fields) {
 }
 
 export default function ImmutableObserver(cursor) {
-  let documents;
+  let documents = new LinkedMap();
+  let documentSeq;
+  let documentMap;
+  let documentList; 
   let dep = new Tracker.Dependency();
 
   function update(newDocuments) {
-    let oldDocuments = documents;
-    documents = newDocuments;
-    if (oldDocuments !== newDocuments) dep.changed();
+    documentSeq = documentMap = documentList = undefined;
+    dep.changed();
   }
 
-  let initialDocuments = {};
+  let initialized = false;
   let handle = cursor.observeChanges({
-    added: (id, fields) => {
+    addedBefore: (id, fields, before) => {
       fields._id = id;
-      if (documents) {
-        update(documents.set(id, Immutable.fromJS(fields)));
-      }
-      else {
-        initialDocuments[id] = fields;
-      }
+      documents.set(id, Immutable.fromJS(fields), before);
+      if (initialized) update();
     },
     changed: (id, fields) => {
-      update(documents.update(id, document => mergeChanges(document, fields)));
+      documents.set(id, mergeChanges(documents.get(id), fields));
+      update();
+    },
+    movedBefore: (id, before) => {
+      documents.move(id, before);
+      update();
     },
     removed: (id) => {
-      update(documents.delete(id));
+      documents.remove(id);
+      update();
     },
   });
-  documents = Immutable.OrderedMap(initialDocuments);
-  initialDocuments = undefined;
+  initialized = true;
 
   if (Tracker.active) {
     Tracker.onInvalidate(() => {
@@ -55,11 +59,47 @@ export default function ImmutableObserver(cursor) {
     });
   }
 
+  function forEach(iteratee, context) {
+    dep.depend();
+    function safeIteratee(value, key) {
+      return iteratee(value, key);
+    }
+    if (arguments.length > 1) {
+      return documents.forEach(safeIteratee, context);
+    }
+    else {
+      return documents.forEach(safeIteratee);
+    }
+  }
+  function getDocumentSeq() {
+    dep.depend();
+    if (!documentSeq) {
+      let items = {};
+      documents.forEach((value, key) => items[key] = value);
+      documentSeq = Immutable.Seq(items);
+    }
+    return documentSeq;
+  }
+  function getDocumentMap() {
+    dep.depend();
+    if (!documentMap) documentMap = getDocumentSeq().toOrderedMap();
+    return documentMap;
+  }
+  function getDocumentList() {
+    dep.depend();
+    if (!documentList) documentList = getDocumentSeq().toList();
+    return documentList;
+  }
+  function count() {
+    return documents.size;
+  }
+
   return {
-    documents() {
-      dep.depend();
-      return documents; 
-    },
+    forEach,
+    count,
+    documentSeq: getDocumentSeq,
+    documentMap: getDocumentMap,
+    documentList: getDocumentList,
     stop() {
       handle.stop();
     }
