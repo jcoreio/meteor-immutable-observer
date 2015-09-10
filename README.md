@@ -8,6 +8,7 @@ This is especially handy to pass to React pure render components; when documents
 `updateDeep` method is used so that objects/arrays inside them that didn't change will still be `===` their
 previous values.
 
+To create one you simply do `ImmutableCursor(MyCollection.find(...))`.  
 It has the same interface as `Mongo.Cursor` with two exceptions:
 * no `observeChanges` method
 * `observe` takes a single callback that will be called with `{newDocuments, oldDocuments}`
