@@ -53,7 +53,7 @@ export default React.createClass({
   getMeteorData() {
     Meteor.subscribe('posts');
     return {
-      posts: ImmutableCursor(Posts.find()).fetch();
+      posts: ImmutableCursor(Posts.find()).fetch(),
     };
   },
   render() {
