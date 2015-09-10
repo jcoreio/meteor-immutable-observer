@@ -33,6 +33,14 @@ var observer = ImmutableObserver(Players.find({}, {limit: 10}));
 observer.stop();
 ```
 
+##### `count(): number`
+
+Returns the number of documents currently available.
+
+Also registers a dependency on the underlying live query.
+
+**Note**: this method is more efficient than the accessors that return `Immutable`s.
+
 ##### `forEach(iteratee: (document?: Immutable.Map, key?: string) => any, context?: any): number`
 
 Calls `iteratee` (optionally with `context` as `this` binding) for each document currently available.
@@ -43,7 +51,7 @@ If `iteratee` returns `false`, iteration will stop.
 
 Returns the number of documents iterated.
 
-**Note**: this method is more efficient than the other accessors.
+**Note**: this method is more efficient than the accessors that return `Immutable`s.
 
 ##### `documentSeq(): Immutable.Seq`
 
@@ -66,6 +74,14 @@ Also registers a dependency on the underlying live query.
 ##### `stop()`
 
 Stops the live query (calls `stop()` on what `observeChanges` returned)
+
+## Performance notes
+
+`ImmutableObserver` uses a linked map internally to handle document order changes efficiently.
+`forEach()` and `count()` access this map directly, so they're most efficient.  The accessors
+that return `Immutable`s lazily create them from the interal linked map, and are invalidated
+any time the data changes.  In future versions I may make different observers for maintaining
+`Immutable.Map`s, `Immutable.List`s, etc.
 
 ## Example (not tested)
 
@@ -114,7 +130,7 @@ export default React.createClass({
   getMeteorData() {
     Meteor.subscribe('posts');
     return {
-      posts: postsObserver.documents(),
+      posts: postsObserver.documentSeq(),
     };
   },
   render() {

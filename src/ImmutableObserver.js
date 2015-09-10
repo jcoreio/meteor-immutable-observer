@@ -91,6 +91,7 @@ export default function ImmutableObserver(cursor) {
     return documentList;
   }
   function count() {
+    dep.depend();
     return documents.size;
   }
 
