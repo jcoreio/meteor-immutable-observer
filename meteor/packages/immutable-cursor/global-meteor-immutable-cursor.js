@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("seamless-immutable"));
+		module.exports = factory(require("immutable"));
 	else if(typeof define === 'function' && define.amd)
-		define(["seamless-immutable"], factory);
+		define(["immutable"], factory);
 	else if(typeof exports === 'object')
-		exports["meteor-seamless-immutable-cursor"] = factory(require("seamless-immutable"));
+		exports["meteor-immutable-cursor"] = factory(require("immutable"));
 	else
-		root["meteor-seamless-immutable-cursor"] = factory(root["Immutable"]);
+		root["meteor-immutable-cursor"] = factory(root["Immutable"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -54,18 +54,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	var global = (function() { return this; })();
+	global.ImmutableCursor = __webpack_require__(1);
 
-	exports.__esModule = true;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _ImmutableCursor = __webpack_require__(1);
-
-	var _ImmutableCursor2 = _interopRequireDefault(_ImmutableCursor);
-
-	exports['default'] = _ImmutableCursor2['default'];
-	module.exports = exports['default'];
 
 /***/ },
 /* 1 */
@@ -78,26 +69,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _seamlessImmutable = __webpack_require__(2);
+	var _immutable = __webpack_require__(2);
 
-	var _seamlessImmutable2 = _interopRequireDefault(_seamlessImmutable);
+	var _immutable2 = _interopRequireDefault(_immutable);
 
 	var _updateDeep = __webpack_require__(3);
 
 	var _updateDeep2 = _interopRequireDefault(_updateDeep);
 
 	function ImmutableCursor(cursor) {
-	  var immutable = _seamlessImmutable2['default'](cursor.fetch());
+	  var documents = _immutable2['default'].fromJS(cursor.fetch());
 	  var dep = new Tracker.Dependency();
 	  var observers = [];
 	  var handle = undefined;
 
-	  function update(newImmutable) {
-	    var oldImmutable = immutable;
-	    immutable = newImmutable;
+	  function update(newDocuments) {
+	    var oldDocuments = documents;
+	    documents = newDocuments;
 	    dep.changed();
 	    observers.forEach(function (observer) {
-	      return observer(newImmutable, oldImmutable);
+	      return observer(newDocuments, oldDocuments);
 	    });
 	    stopObservingIfUnncessary();
 	  }
@@ -110,57 +101,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  function _observe() {
-	    update(_seamlessImmutable2['default'](cursor.fetch()));
+	    update(_immutable2['default'].fromJS(cursor.fetch()));
 	    handle = cursor.observe({
 	      addedAt: function addedAt(document, atIndex, before) {
-	        if (atIndex === immutable.length) {
-	          update(immutable.concat(_seamlessImmutable2['default'](document)));
-	        } else {
-	          var array = immutable.asMutable();
-	          array.splice(atIndex, 0, _seamlessImmutable2['default'](document));
-	          update(_seamlessImmutable2['default'](array));
-	        }
+	        update(documents.splice(atIndex, 0, _immutable2['default'].fromJS(document)));
 	      },
 	      changedAt: function changedAt(newDocument, oldDocument, atIndex) {
-	        var array = immutable.asMutable();
-	        array[atIndex] = _updateDeep2['default'](array[atIndex], newDocument);
-	        update(_seamlessImmutable2['default'](array));
+	        update(documents.update(atIndex, function (oldDocument) {
+	          return _updateDeep2['default'](oldDocument, _immutable2['default'].fromJS(newDocument));
+	        }));
 	      },
 	      removedAt: function removedAt(oldDocument, atIndex) {
-	        var array = immutable.asMutable();
-	        array.splice(atIndex, 1);
-	        update(_seamlessImmutable2['default'](array));
+	        update(documents.splice(atIndex, 1));
 	      },
 	      movedTo: function movedTo(document, fromIndex, toIndex, before) {
-	        var array = immutable.asMutable();
-	        var elem = array[fromIndex];
-
-	        array.splice(fromIndex, 1);
-	        array.splice(toIndex, 0, elem);
-	        update(_seamlessImmutable2['default'](array));
+	        var immDocument = documents.get(fromIndex);
+	        update(documents['delete'](fromIndex).splice(toIndex, 0, immDocument));
 	      }
 	    });
 	  }
 
 	  return {
 	    forEach: function forEach() {
-	      var _immutable;
+	      var _documents;
 
 	      if (dep.depend() && !handle) _observe();
-	      return (_immutable = immutable).forEach.apply(_immutable, arguments);
+	      return (_documents = documents).forEach.apply(_documents, arguments);
 	    },
 	    map: function map() {
-	      var _immutable2;
+	      var _documents2;
 
 	      if (dep.depend() && !handle) _observe();
-	      return (_immutable2 = immutable).map.apply(_immutable2, arguments);
+	      return (_documents2 = documents).map.apply(_documents2, arguments);
 	    },
 	    count: function count() {
 	      return cursor.count();
 	    },
 	    fetch: function fetch() {
 	      if (dep.depend() && !handle) _observe();
-	      return immutable;
+	      return documents;
 	    },
 	    observe: function observe(callback) {
 	      if (!handle) _observe();
@@ -197,37 +176,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _seamlessImmutable = __webpack_require__(2);
+	var _immutable = __webpack_require__(2);
 
-	var _seamlessImmutable2 = _interopRequireDefault(_seamlessImmutable);
+	var _immutable2 = _interopRequireDefault(_immutable);
 
 	function updateDeep(a, b) {
-	  if ((a instanceof Object || a instanceof Array) && Object.getPrototypeOf(a) === Object.getPrototypeOf(b)) {
-	    for (var key in a) {
-	      if (!b.hasOwnProperty(key)) {
-	        var updated = a instanceof Object ? {} : [];
-	        for (var key in b) {
-	          var updatedValue = updateDeep(a[key], b[key]);
-	          if (updatedValue !== a[key]) {
-	            updated[key] = updatedValue;
-	          }
-	        }
-	        return _seamlessImmutable2['default'](updated);
-	      }
-	    }
-
-	    var updated;
-	    for (var key in b) {
-	      var updatedValue = updateDeep(a[key], b[key]);
-	      if (updatedValue !== a[key]) {
-	        if (!updated) updated = a.asMutable();
-	        updated[key] = updatedValue;
-	      }
-	    }
-
-	    return updated ? _seamlessImmutable2['default'](updated) : a;
+	  if (!(a instanceof _immutable2['default'].Collection) || !(b instanceof _immutable2['default'].Collection) || Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) {
+	    return a === b ? a : b;
 	  }
-	  return _seamlessImmutable2['default'](b);
+	  return a.withMutations(function (result) {
+	    a.forEach(function (oldValue, key) {
+	      if (!b.has(key)) {
+	        result['delete'](key);
+	      }
+	    });
+	    b.forEach(function (newValue, key) {
+	      if (!a.has(key)) {
+	        result.set(key, newValue);
+	      } else {
+	        result.set(key, updateDeep(a.get(key), newValue));
+	      }
+	    });
+	  });
 	}
 
 	module.exports = exports['default'];

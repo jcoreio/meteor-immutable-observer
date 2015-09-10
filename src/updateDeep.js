@@ -1,31 +1,24 @@
-import Immutable from 'seamless-immutable';
+import Immutable from 'immutable';
 
 export default function updateDeep(a, b) {
-  if ((a instanceof Object || a instanceof Array) &&
-      Object.getPrototypeOf(a) === Object.getPrototypeOf(b)) {
-    for (var key in a) {
-      if (!b.hasOwnProperty(key)) {
-        var updated = a instanceof Object ? {} : [];
-        for (var key in b) {
-          var updatedValue = updateDeep(a[key], b[key]);
-          if (updatedValue !== a[key]) {
-            updated[key] = updatedValue;
-          }
-        }      
-        return Immutable(updated);
-      }
-    }
-
-    var updated;
-    for (var key in b) {
-      var updatedValue = updateDeep(a[key], b[key]);
-      if (updatedValue !== a[key]) {
-        if (!updated) updated = a.asMutable();
-        updated[key] = updatedValue;
-      }
-    }
-
-    return updated ? Immutable(updated) : a;
+  if (!(a instanceof Immutable.Collection) ||
+      !(b instanceof Immutable.Collection) ||
+      Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) {
+    return a === b ? a : b;
   }
-  return Immutable(b);
+  return a.withMutations(result => {
+    a.forEach((oldValue, key) => {
+      if (!b.has(key)) {
+        result.delete(key);
+      }
+    });
+    b.forEach((newValue, key) => {
+      if (!a.has(key)) {
+        result.set(key, newValue);
+      }
+      else {
+        result.set(key, updateDeep(a.get(key), newValue));
+      }
+    });
+  });
 }

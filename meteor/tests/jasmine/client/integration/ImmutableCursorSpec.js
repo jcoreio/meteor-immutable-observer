@@ -10,7 +10,7 @@ describe('ImmutableCursor', function() {
     var comp = Tracker.autorun(function() {
       Meteor.subscribe('players');
       var cursor = ImmutableCursor(Players.find({name: 'Andy', score: {$gt: 1000000}})); 
-      if (cursor.fetch().length) {
+      if (cursor.fetch().size && cursor.fetch().getIn([0, 'score']) > 1000000) {
         clearTimeout(failTimeout);
         done();
       }

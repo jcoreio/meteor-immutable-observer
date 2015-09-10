@@ -8,6 +8,7 @@ boilerplate-generator@1.0.3
 callback-hook@1.0.3
 check@1.0.5
 coffeescript@1.0.6
+dataflows:immutable@3.6.2
 ddp@1.1.0
 deps@1.0.7
 ejson@1.0.6
@@ -19,7 +20,7 @@ htmljs@1.0.4
 http@1.1.0
 id-map@1.0.3
 insecure@1.0.3
-jedwards1211:seamless-immutable-cursor@0.0.1
+jedwards1211:immutable-cursor@0.0.1
 jquery@1.11.3_2
 json@1.0.3
 launch-screen@1.0.2

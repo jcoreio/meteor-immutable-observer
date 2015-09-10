@@ -3,17 +3,17 @@ var webpack = require('webpack');
 module.exports = {
 
   output: {
-    library: 'meteor-seamless-immutable-cursor',
+    library: 'meteor-immutable-cursor',
     libraryTarget: 'umd'
   },
 
   externals: [
     {
-      "seamless-immutable": {
+      "immutable": {
         root: "Immutable",
-        commonjs2: "seamless-immutable",
-        commonjs: "seamless-immutable",
-        amd: "seamless-immutable"
+        commonjs2: "immutable",
+        commonjs: "immutable",
+        amd: "immutable"
       }
     }
   ],

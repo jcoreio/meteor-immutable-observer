@@ -1,18 +1,18 @@
-import Immutable from 'seamless-immutable';
+import Immutable from 'immutable';
 
 import updateDeep from './updateDeep';
 
 export default function ImmutableCursor(cursor) {
-  let immutable = Immutable(cursor.fetch());
+  let documents = Immutable.fromJS(cursor.fetch());
   let dep = new Tracker.Dependency();
   let observers = [];
   let handle;
 
-  function update(newImmutable) {
-    let oldImmutable = immutable;
-    immutable = newImmutable;
+  function update(newDocuments) {
+    let oldDocuments = documents;
+    documents = newDocuments;
     dep.changed();
-    observers.forEach(observer => observer(newImmutable, oldImmutable));
+    observers.forEach(observer => observer(newDocuments, oldDocuments));
     stopObservingIfUnncessary();
   }
 
@@ -24,35 +24,21 @@ export default function ImmutableCursor(cursor) {
   }
 
   function observe() {
-    update(Immutable(cursor.fetch()));
+    update(Immutable.fromJS(cursor.fetch()));
     handle = cursor.observe({
       addedAt: (document, atIndex, before) => {
-        if (atIndex === immutable.length) {
-          update(immutable.concat(Immutable(document)));
-        }
-        else {
-          let array = immutable.asMutable();
-          array.splice(atIndex, 0, Immutable(document));
-          update(Immutable(array));
-        }
+        update(documents.splice(atIndex, 0, Immutable.fromJS(document)));
       },
       changedAt: (newDocument, oldDocument, atIndex) => {
-        let array = immutable.asMutable();
-        array[atIndex] = updateDeep(array[atIndex], newDocument);
-        update(Immutable(array));
+        update(documents.update(atIndex, 
+          oldDocument => updateDeep(oldDocument, Immutable.fromJS(newDocument))));
       },
       removedAt: (oldDocument, atIndex) => {
-        let array = immutable.asMutable();
-        array.splice(atIndex, 1);
-        update(Immutable(array));
+        update(documents.splice(atIndex, 1));
       },
       movedTo: (document, fromIndex, toIndex, before) => {
-        let array = immutable.asMutable();
-        let elem = array[fromIndex];
-
-        array.splice(fromIndex, 1);
-        array.splice(toIndex, 0, elem);
-        update(Immutable(array));
+        var immDocument = documents.get(fromIndex);
+        update(documents.delete(fromIndex).splice(toIndex, 0, immDocument));
       },
     });
   }
@@ -60,18 +46,18 @@ export default function ImmutableCursor(cursor) {
   return {
     forEach(...args) {
       if (dep.depend() && !handle) observe();
-      return immutable.forEach(...args);
+      return documents.forEach(...args);
     },
     map(...args) {
       if (dep.depend() && !handle) observe();
-      return immutable.map(...args);
+      return documents.map(...args);
     },
     count() {
       return cursor.count();
     },
     fetch() {
       if (dep.depend() && !handle) observe();
-      return immutable; 
+      return documents; 
     },
     observe(callback) {
       if (!handle) observe();
