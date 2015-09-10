@@ -15,7 +15,7 @@ previous values.
 If you use the `jedwards1211:immutable-observer` package, `ImmutableObserver` will be defined in package scope.
 Alternatively, you may use it as an NPM package: `var ImmutableObserver = require('meteor-immutable-observer');`
 
-### `ImmutableObserver(cursor)`
+##### `ImmutableObserver(cursor)`
 
 Begins a live query on `cursor`, which should be a `Mongo.Cursor` returned by a `Meteor.Collection`'s `find()`.
 
@@ -33,7 +33,7 @@ var observer = ImmutableObserver(Players.find({}, {limit: 10}));
 observer.stop();
 ```
 
-### `forEach(iteratee: (document?: Immutable.Map, key?: string) => any, context?: any): number`
+##### `forEach(iteratee: (document?: Immutable.Map, key?: string) => any, context?: any): number`
 
 Calls `iteratee` (optionally with `context` as `this` binding) for each document currently available.
 
@@ -45,25 +45,25 @@ Returns the number of documents iterated.
 
 **Note**: this method is more efficient than the other accessors.
 
-### `documentSeq(): Immutable.Seq`
+##### `documentSeq(): Immutable.Seq`
 
 Returns a lazily-created `Immutable.Seq` of the currently available documents.
 
 Also registers a dependency on the underlying live query.
 
-### `documentMap(): Immutable.OrderedMap`
+##### `documentMap(): Immutable.OrderedMap`
 
 Returns a lazily-created `Immutable.OrderedMap` of the currently available documents.
 
 Also registers a dependency on the underlying live query.
 
-### `documentList(): Immutable.OrderedList`
+##### `documentList(): Immutable.OrderedList`
 
 Returns a lazily-created `Immutable.OrderedList` of the currently available documents.
 
 Also registers a dependency on the underlying live query.
 
-### `stop()`
+##### `stop()`
 
 Stops the live query (calls `stop()` on what `observeChanges` returned)
 
