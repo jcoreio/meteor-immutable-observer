@@ -19,7 +19,7 @@ it will be stopped automatically when the computation is invalidated).
 ```jsx
 import React from 'react';
 import classNames from 'classnames';
-import ImmutableObserver from 'meteor-seamless-immutable-observer';
+import ImmutableObserver from 'meteor-immutable-observer';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 
 class Post extends React.Component {
