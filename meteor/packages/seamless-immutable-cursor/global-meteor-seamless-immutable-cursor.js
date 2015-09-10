@@ -73,6 +73,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _seamlessImmutable2 = _interopRequireDefault(_seamlessImmutable);
 
+	var _updateDeep = __webpack_require__(3);
+
+	var _updateDeep2 = _interopRequireDefault(_updateDeep);
+
 	function ImmutableCursor(cursor) {
 	  var immutable = _seamlessImmutable2['default'](cursor.fetch());
 	  var dep = new Tracker.Dependency();
@@ -110,7 +114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      },
 	      changedAt: function changedAt(newDocument, oldDocument, atIndex) {
 	        var array = immutable.asMutable();
-	        array[atIndex] = _seamlessImmutable2['default'](newDocument);
+	        array[atIndex] = _updateDeep2['default'](array[atIndex], newDocument);
 	        update(_seamlessImmutable2['default'](array));
 	      },
 	      removedAt: function removedAt(oldDocument, atIndex) {
@@ -172,6 +176,52 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = updateDeep;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _seamlessImmutable = __webpack_require__(2);
+
+	var _seamlessImmutable2 = _interopRequireDefault(_seamlessImmutable);
+
+	function updateDeep(a, b) {
+	  if ((a instanceof Object || a instanceof Array) && Object.getPrototypeOf(a) === Object.getPrototypeOf(b)) {
+	    for (var key in a) {
+	      if (!b.hasOwnProperty(key)) {
+	        var updated = a instanceof Object ? {} : [];
+	        for (var key in b) {
+	          var updatedValue = updateDeep(a[key], b[key]);
+	          if (updatedValue !== a[key]) {
+	            updated[key] = updatedValue;
+	          }
+	        }
+	        return _seamlessImmutable2['default'](updated);
+	      }
+	    }
+
+	    var updated;
+	    for (var key in b) {
+	      var updatedValue = updateDeep(a[key], b[key]);
+	      if (updatedValue !== a[key]) {
+	        if (!updated) updated = a.asMutable();
+	        updated[key] = updatedValue;
+	      }
+	    }
+
+	    return updated ? _seamlessImmutable2['default'](updated) : a;
+	  }
+	  return _seamlessImmutable2['default'](b);
+	}
+
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

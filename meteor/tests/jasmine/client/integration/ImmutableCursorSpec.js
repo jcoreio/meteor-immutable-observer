@@ -19,7 +19,6 @@ describe('ImmutableCursor', function() {
       if (error) {
         fail(error);
       }
-      console.log('id: ' + _id);
       Players.update({_id: _id}, {$inc: {score: 5}});
     });
   });

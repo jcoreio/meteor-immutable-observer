@@ -1,5 +1,7 @@
 import Immutable from 'seamless-immutable';
 
+import updateDeep from './updateDeep';
+
 export default function ImmutableCursor(cursor) {
   let immutable = Immutable(cursor.fetch());
   let dep = new Tracker.Dependency();
@@ -36,7 +38,7 @@ export default function ImmutableCursor(cursor) {
       },
       changedAt: (newDocument, oldDocument, atIndex) => {
         let array = immutable.asMutable();
-        array[atIndex] = Immutable(newDocument);
+        array[atIndex] = updateDeep(array[atIndex], newDocument);
         update(Immutable(array));
       },
       removedAt: (oldDocument, atIndex) => {
