@@ -116,7 +116,7 @@ class PostList extends React.Component {
 export default React.createClass({
   mixins: [ReactMeteorData], 
   componentWillMount() {
-    this.postsObserver = ImmutableObserver(Posts.find());
+    this.postsObserver = ImmutableObserver.List(Posts.find({}, {sort: {createdDate: 1}}));
   }
   componentWillUnmount() {
     this.postsObserver.stop();
