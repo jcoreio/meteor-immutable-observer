@@ -8,11 +8,74 @@ This is especially handy to pass to React pure render components; when documents
 `updateDeep` method is used so that objects/arrays inside them that didn't change will still be `===` their
 previous values.
 
-To create one you simply do `var observer = ImmutableObserver(MyCollection.find(...))`.
-`observer.documents()` will return an `Immutable.OrderedMap` of the documents indexed by id, and register
-a dependency on the underlying documents.
-You must later call `stop()` on it (although if it is created inside a reactive computation, 
-it will be stopped automatically when the computation is invalidated).
+## API
+
+(TODO: deploy to npm/atmosphere)
+
+If you use the `jedwards1211:immutable-observer` package, `ImmutableObserver` will be defined in package scope.
+Alternatively, you may use it as an NPM package: `var ImmutableObserver = require('meteor-immutable-observer');`
+
+### `ImmutableObserver.Map(cursor: Mongo.Cursor)`
+
+Begins a live query via `cursor.observeChanges`, and tracks changes in an `Immutable.Map` of documents indexed by `_id`.
+
+Theoretically this should perform better than `ImmutableObserver.List`, since it doesn't keep track of document order.
+
+**This should not be called within a reactive computation.**  Since its `observeChanges` can trigger dependency
+changes, it could cause an infinite autorun loop.
+
+*Make sure you `stop()` the cursor when done with it.*
+
+###### Example:
+
+```javascript
+var Players = new Meteor.Collection('players');
+var observer = ImmutableObserver.Map(Players.find({}, {limit: 10}));
+...
+observer.stop();
+```
+
+#### Methods
+
+##### `documents(): Immutable.Map`
+
+Returns an `Immutable.Map` of the currently available documents, indexed by `_id`.
+
+Also registers a dependency on the underlying live query.
+
+##### `stop()`
+
+Stops the live query (calls `stop()` on what `observeChanges` returned)
+
+### `ImmutableObserver.List(cursor: Mongo.Cursor)`
+
+Begins a live query via `cursor.observe`, and tracks changes in an `Immutable.List` of documents in order.
+
+**This should not be called within a reactive computation.**  Since its `observe` can trigger dependency
+changes, it could cause an infinite autorun loop.
+
+*Make sure you `stop()` the cursor when done with it.*
+
+###### Example:
+
+```javascript
+var Players = new Meteor.Collection('players');
+var observer = ImmutableObserver.List(Players.find({}, {sort: {score: 1}, limit: 10}));
+...
+observer.stop();
+```
+
+#### Methods
+
+##### `documents(): Immutable.List`
+
+Returns an `Immutable.List` of the currently available documents.
+
+Also registers a dependency on the underlying live query.
+
+##### `stop()`
+
+Stops the live query (calls `stop()` on what `observe` returned)
 
 ## Example (not tested)
 

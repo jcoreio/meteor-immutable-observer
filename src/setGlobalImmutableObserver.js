@@ -1,2 +1,2 @@
 var global = (function() { return this; })();
-global.ImmutableObserver = require('./ImmutableObserver');
+global.ImmutableObserver = require('./index');

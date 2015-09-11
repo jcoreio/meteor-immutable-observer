@@ -7,7 +7,7 @@
 		exports["meteor-immutable-observer"] = factory(require("immutable"));
 	else
 		root["meteor-immutable-observer"] = factory(root["Immutable"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -65,15 +65,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = ImmutableObserver;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _immutable = __webpack_require__(2);
+	var _ImmutableMapObserver = __webpack_require__(2);
+
+	var _ImmutableMapObserver2 = _interopRequireDefault(_ImmutableMapObserver);
+
+	var _ImmutableListObserver = __webpack_require__(5);
+
+	var _ImmutableListObserver2 = _interopRequireDefault(_ImmutableListObserver);
+
+	exports['default'] = {
+	  Map: _ImmutableMapObserver2['default'],
+	  List: _ImmutableListObserver2['default']
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = ImmutableMapObserver;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _immutable = __webpack_require__(3);
 
 	var _immutable2 = _interopRequireDefault(_immutable);
 
-	var _updateDeep = __webpack_require__(3);
+	var _updateDeep = __webpack_require__(4);
 
 	var _updateDeep2 = _interopRequireDefault(_updateDeep);
 
@@ -94,24 +118,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
-	function ImmutableObserver(cursor) {
+	function ImmutableMapObserver(cursor) {
 	  var _documents = undefined;
 	  var dep = new Tracker.Dependency();
 
 	  function update(newDocuments) {
-	    var oldDocuments = _documents;
 	    _documents = newDocuments;
-	    if (oldDocuments !== newDocuments) dep.changed();
+	    dep.changed();
 	  }
 
 	  var initialDocuments = {};
 	  var handle = cursor.observeChanges({
 	    added: function added(id, fields) {
 	      fields._id = id;
-	      if (_documents) {
-	        update(_documents.set(id, _immutable2['default'].fromJS(fields)));
+	      if (initialDocuments) {
+	        initialDocuments[id] = _immutable2['default'].fromJS(fields);
 	      } else {
-	        initialDocuments[id] = fields;
+	        update(_documents.set(id, _immutable2['default'].fromJS(fields)));
 	      }
 	    },
 	    changed: function changed(id, fields) {
@@ -123,7 +146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      update(_documents['delete'](id));
 	    }
 	  });
-	  _documents = _immutable2['default'].OrderedMap(initialDocuments);
+	  _documents = _immutable2['default'].Map(initialDocuments);
 	  initialDocuments = undefined;
 
 	  if (Tracker.active) {
@@ -146,13 +169,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -162,7 +185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _immutable = __webpack_require__(2);
+	var _immutable = __webpack_require__(3);
 
 	var _immutable2 = _interopRequireDefault(_immutable);
 
@@ -184,6 +207,78 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    });
 	  });
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = ImmutableListObserver;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _immutable = __webpack_require__(3);
+
+	var _immutable2 = _interopRequireDefault(_immutable);
+
+	var _updateDeep = __webpack_require__(4);
+
+	var _updateDeep2 = _interopRequireDefault(_updateDeep);
+
+	function ImmutableListObserver(cursor) {
+	  var _documents = undefined;
+	  var dep = new Tracker.Dependency();
+
+	  function update(newDocuments) {
+	    _documents = newDocuments;
+	    dep.changed();
+	  }
+
+	  var initialDocuments = [];
+	  var handle = cursor.observe({
+	    addedAt: function addedAt(document, atIndex, before) {
+	      if (initialDocuments) {
+	        initialDocuments.splice(atIndex, 0, _immutable2['default'].fromJS(document));
+	      } else {
+	        update(_documents.splice(atIndex, 0, _immutable2['default'].fromJS(document)));
+	      }
+	    },
+	    changedAt: function changedAt(newDocument, oldDocument, atIndex) {
+	      update(_documents.update(id, function (document) {
+	        return _updateDeep2['default'](document, _immutable2['default'].fromJS(newDocument));
+	      }));
+	    },
+	    removedAt: function removedAt(oldDocument, atIndex) {
+	      update(_documents.splice(atIndex, 1));
+	    },
+	    movedTo: function movedTo(document, fromIndex, toIndex, before) {
+	      var movedDocument = _documents.get(fromIndex);
+	      update(_documents.splice(fromIndex, 1).splice(toIndex, 0, movedDocument));
+	    }
+	  });
+	  _documents = _immutable2['default'].List(initialDocuments);
+	  initialDocuments = undefined;
+
+	  if (Tracker.active) {
+	    Tracker.onInvalidate(function () {
+	      handle.stop();
+	    });
+	  }
+
+	  return {
+	    documents: function documents() {
+	      dep.depend();
+	      return _documents;
+	    },
+	    stop: function stop() {
+	      handle.stop();
+	    }
+	  };
 	}
 
 	module.exports = exports['default'];

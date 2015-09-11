@@ -18,25 +18,24 @@ function mergeChanges(document, fields) {
   });
 }
 
-export default function ImmutableObserver(cursor) {
+export default function ImmutableMapObserver(cursor) {
   let documents;
   let dep = new Tracker.Dependency();
 
   function update(newDocuments) {
-    let oldDocuments = documents;
     documents = newDocuments;
-    if (oldDocuments !== newDocuments) dep.changed();
+    dep.changed();
   }
 
   let initialDocuments = {};
   let handle = cursor.observeChanges({
     added: (id, fields) => {
       fields._id = id;
-      if (documents) {
-        update(documents.set(id, Immutable.fromJS(fields)));
+      if (initialDocuments) {
+        initialDocuments[id] = Immutable.fromJS(fields);
       }
       else {
-        initialDocuments[id] = fields;
+        update(documents.set(id, Immutable.fromJS(fields)));
       }
     },
     changed: (id, fields) => {
@@ -46,7 +45,7 @@ export default function ImmutableObserver(cursor) {
       update(documents.delete(id));
     },
   });
-  documents = Immutable.OrderedMap(initialDocuments);
+  documents = Immutable.Map(initialDocuments);
   initialDocuments = undefined;
 
   if (Tracker.active) {

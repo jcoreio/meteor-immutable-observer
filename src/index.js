@@ -1,1 +1,7 @@
-export default from './ImmutableObserver';
+import Map from './ImmutableMapObserver';
+import List from './ImmutableListObserver';
+
+export default {
+  Map,
+  List,
+};
