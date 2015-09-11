@@ -8,12 +8,25 @@ This is especially handy to pass to React pure render components; when documents
 `updateDeep` method is used so that objects/arrays inside them that didn't change will still be `===` their
 previous values.
 
+## Installation
+
+**(not deployed yet)**
+
+### Node/Webpack/Browserify/jspm/HTML9 Responsive Boilerstrap JS
+```
+npm install meteor-immutable-observer
+```
+Then `var ImmutableObserver = require('meteor-immutable-observer')`
+
+There are Webpack UMDs in the `lib/umd` folder (they rely on `immutable` being in a commons chunk)
+
+### Meteor (Atmosphere)
+```
+meteor add mindfront:immutable-observer
+```
+This will put `ImmutableObserver` in the package scope.
+
 ## API
-
-(TODO: deploy to npm/atmosphere)
-
-If you use the `jedwards1211:immutable-observer` package, `ImmutableObserver` will be defined in package scope.
-Alternatively, you may use it as an NPM package: `var ImmutableObserver = require('meteor-immutable-observer');`
 
 ### `ImmutableObserver.Map(cursor: Mongo.Cursor)`
 
