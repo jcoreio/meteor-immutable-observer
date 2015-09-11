@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jedwards1211/meteor-immutable-observer"
+    "url": "https://github.com/mindfront/meteor-immutable-observer"
   },
   "keywords": [
     "meteor",
@@ -22,9 +22,9 @@
   "author": "Andy Edwards",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jedwards1211/meteor-immutable-observer/issues"
+    "url": "https://github.com/mindfront/meteor-immutable-observer/issues"
   },
-  "homepage": "https://github.com/jedwards1211/meteor-immutable-observer",
+  "homepage": "https://github.com/mindfront/meteor-immutable-observer",
   "peerDependencies": {
     "immutable": "^3.7.5"
   },
