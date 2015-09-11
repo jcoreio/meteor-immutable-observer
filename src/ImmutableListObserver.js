@@ -3,6 +3,10 @@ import Immutable from 'immutable';
 import updateDeep from './updateDeep';
 
 export default function ImmutableListObserver(cursor) {
+  if (Tracker.active) {
+    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
+  }
+
   let documents;
   let dep = new Tracker.Dependency();
 
@@ -22,7 +26,7 @@ export default function ImmutableListObserver(cursor) {
       }
     },
     changedAt: (newDocument, oldDocument, atIndex) => {
-      update(documents.update(id, document => updateDeep(document, Immutable.fromJS(newDocument))));
+      update(documents.update(atIndex, document => updateDeep(document, Immutable.fromJS(newDocument))));
     },
     removedAt: (oldDocument, atIndex) => {
       update(documents.splice(atIndex, 1));
@@ -34,12 +38,6 @@ export default function ImmutableListObserver(cursor) {
   });
   documents = Immutable.List(initialDocuments);
   initialDocuments = undefined;
-
-  if (Tracker.active) {
-    Tracker.onInvalidate(() => {
-      handle.stop();
-    });
-  }
 
   return {
     documents() {

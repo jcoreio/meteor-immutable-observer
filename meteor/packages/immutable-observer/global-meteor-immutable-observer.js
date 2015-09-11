@@ -119,6 +119,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function ImmutableMapObserver(cursor) {
+	  if (Tracker.active) {
+	    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
+	  }
+
 	  var _documents = undefined;
 	  var dep = new Tracker.Dependency();
 
@@ -148,12 +152,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	  _documents = _immutable2['default'].Map(initialDocuments);
 	  initialDocuments = undefined;
-
-	  if (Tracker.active) {
-	    Tracker.onInvalidate(function () {
-	      handle.stop();
-	    });
-	  }
 
 	  return {
 	    documents: function documents() {
@@ -231,6 +229,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _updateDeep2 = _interopRequireDefault(_updateDeep);
 
 	function ImmutableListObserver(cursor) {
+	  if (Tracker.active) {
+	    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
+	  }
+
 	  var _documents = undefined;
 	  var dep = new Tracker.Dependency();
 
@@ -249,7 +251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    },
 	    changedAt: function changedAt(newDocument, oldDocument, atIndex) {
-	      update(_documents.update(id, function (document) {
+	      update(_documents.update(atIndex, function (document) {
 	        return _updateDeep2['default'](document, _immutable2['default'].fromJS(newDocument));
 	      }));
 	    },
@@ -263,12 +265,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	  _documents = _immutable2['default'].List(initialDocuments);
 	  initialDocuments = undefined;
-
-	  if (Tracker.active) {
-	    Tracker.onInvalidate(function () {
-	      handle.stop();
-	    });
-	  }
 
 	  return {
 	    documents: function documents() {

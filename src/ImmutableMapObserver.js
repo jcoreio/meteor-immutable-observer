@@ -19,6 +19,10 @@ function mergeChanges(document, fields) {
 }
 
 export default function ImmutableMapObserver(cursor) {
+  if (Tracker.active) {
+    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
+  }
+
   let documents;
   let dep = new Tracker.Dependency();
 
@@ -47,12 +51,6 @@ export default function ImmutableMapObserver(cursor) {
   });
   documents = Immutable.Map(initialDocuments);
   initialDocuments = undefined;
-
-  if (Tracker.active) {
-    Tracker.onInvalidate(() => {
-      handle.stop();
-    });
-  }
 
   return {
     documents() {

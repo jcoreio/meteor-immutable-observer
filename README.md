@@ -1,16 +1,13 @@
 # meteor-immutable-observer
 
-**(work in progress!)**
-
-This uses [`Mongo.Cursor.observe`](http://docs.meteor.com/#/full/observe)  and `Mongo.Cursor.observeChanges`
+This uses [`Mongo.Cursor.observe`](http://docs.meteor.com/#/full/observe) and 
+[`Mongo.Cursor.observeChanges`](http://docs.meteor.com/#/full/observe)
 to provide [Immutable.js](http://facebook.github.io/immutable-js/) views of the collection and its documents.
 This is especially handy to pass to React pure render components; when documents are changed, a custom
 `updateDeep` method is used so that objects/arrays inside them that didn't change will still be `===` their
 previous values.
 
 ## Installation
-
-**(not deployed yet)**
 
 ### Node/Webpack/Browserify/jspm/HTML9 Responsive Boilerstrap JS
 ```
@@ -26,6 +23,8 @@ meteor add mindfront:immutable-observer
 ```
 This will put `ImmutableObserver` in the package scope.
 
+I would recommend using [meteor-webpack-react](https://github.com/jedwards1211/meteor-webpack-react) instead.
+
 ## API
 
 ### `ImmutableObserver.Map(cursor: Mongo.Cursor)`
@@ -34,8 +33,8 @@ Begins a live query via `cursor.observeChanges`, and tracks changes in an `Immut
 
 Theoretically this should perform better than `ImmutableObserver.List`, since it doesn't keep track of document order.
 
-**This should not be called within a reactive computation.**  Since its `observeChanges` can trigger dependency
-changes, it could cause an infinite autorun loop.
+**This should not be called within a reactive computation.**  It will throw an error.
+Since its `observeChanges` can trigger dependency changes, it could cause an infinite autorun loop.
 
 *Make sure you `stop()` the observer when done with it.*
 
@@ -64,8 +63,8 @@ Stops the live query (calls `stop()` on what `observeChanges` returned)
 
 Begins a live query via `cursor.observe`, and tracks changes in an `Immutable.List` of documents in order.
 
-**This should not be called within a reactive computation.**  Since its `observe` can trigger dependency
-changes, it could cause an infinite autorun loop.
+**This should not be called within a reactive computation.**  It will throw an error.
+Since its `observe` can trigger dependency changes, it could cause an infinite autorun loop.
 
 *Make sure you `stop()` the observer when done with it.*
 
