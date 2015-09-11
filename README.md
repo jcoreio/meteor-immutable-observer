@@ -2,8 +2,8 @@
 
 **(work in progress!)**
 
-This uses [`Mongo.Cursor.observeChanges`](http://docs.meteor.com/#/full/observe_changes) to provide
-[Immutable.js](http://facebook.github.io/immutable-js/) views of the collection and its documents.
+This uses [`Mongo.Cursor.observe`](http://docs.meteor.com/#/full/observe)  and `Mongo.Cursor.observeChanges`
+to provide [Immutable.js](http://facebook.github.io/immutable-js/) views of the collection and its documents.
 This is especially handy to pass to React pure render components; when documents are changed, a custom
 `updateDeep` method is used so that objects/arrays inside them that didn't change will still be `===` their
 previous values.
@@ -37,7 +37,7 @@ Theoretically this should perform better than `ImmutableObserver.List`, since it
 **This should not be called within a reactive computation.**  Since its `observeChanges` can trigger dependency
 changes, it could cause an infinite autorun loop.
 
-*Make sure you `stop()` the cursor when done with it.*
+*Make sure you `stop()` the observer when done with it.*
 
 ###### Example:
 
@@ -67,7 +67,7 @@ Begins a live query via `cursor.observe`, and tracks changes in an `Immutable.Li
 **This should not be called within a reactive computation.**  Since its `observe` can trigger dependency
 changes, it could cause an infinite autorun loop.
 
-*Make sure you `stop()` the cursor when done with it.*
+*Make sure you `stop()` the observer when done with it.*
 
 ###### Example:
 
