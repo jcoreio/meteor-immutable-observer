@@ -11,7 +11,7 @@ previous values.
 
 ### Node/Webpack/Browserify/jspm/HTML9 Responsive Boilerstrap JS
 ```
-npm install meteor-immutable-observer
+npm install immutable meteor-immutable-observer
 ```
 Then `var ImmutableObserver = require('meteor-immutable-observer')`
 
