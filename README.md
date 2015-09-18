@@ -129,13 +129,14 @@ class PostList extends React.Component {
 export default React.createClass({
   mixins: [ReactMeteorData], 
   componentWillMount() {
+    this.subscription = Meteor.subscribe('posts');
     this.postsObserver = ImmutableObserver.List(Posts.find({}, {sort: {createdDate: 1}}));
   }
   componentWillUnmount() {
+    this.subscription.stop();
     this.postsObserver.stop();
   }
   getMeteorData() {
-    Meteor.subscribe('posts');
     return {
       posts: postsObserver.documents(),
     };
