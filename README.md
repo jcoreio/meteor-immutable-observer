@@ -10,8 +10,6 @@ previous values.
 
 ## Installation
 
-**(not deployed yet)**
-
 ### Node/Webpack/Browserify/jspm/HTML9 Responsive Boilerstrap JS
 ```
 npm install meteor-immutable-observer
@@ -20,13 +18,15 @@ Then `var ImmutableObserver = require('meteor-immutable-observer')`
 
 There are Webpack UMDs in the `lib/umd` folder (they rely on `immutable` being in a commons chunk)
 
-### Meteor (Atmosphere)
+### Meteor Package *(not deployed here yet)*
 ```
 meteor add mindfront:immutable-observer
 ```
 This will put `ImmutableObserver` in the package scope.
 
 ## API
+
+**Note**: this doesn't seem to work properly when you `Meteor.subscribe()` to your collection within the same reactive computation.  I haven't yet investigated exactly why.  Right now I just `subscribe()` outside of any reactive computation.
 
 ### `ImmutableObserver.Map(cursor: Mongo.Cursor)`
 
