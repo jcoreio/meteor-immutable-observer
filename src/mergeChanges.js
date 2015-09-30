@@ -1,5 +1,7 @@
 import Immutable from 'immutable';
 
+import updateDeep from './updateDeep';
+
 export default function mergeChanges(document, fields) {
   return document.withMutations(document => {
     for (var key in fields) {

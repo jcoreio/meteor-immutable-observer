@@ -20,7 +20,9 @@ Package.onTest(function(api) {
   api.use('sanjo:jasmine@0.18.0');
   api.use('dataflows:immutable@3.6.2')
   api.use('insecure');
+  api.use('aldeed:collection2@2.5.0');
   api.addFiles('global-meteor-immutable-observer.js');
   api.addFiles('tests/Players.js');
+  api.addFiles('tests/UserNotifications.js');
   api.addFiles('tests/client/ImmutableObserverSpec.js', 'client');
 });

@@ -72,13 +72,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ImmutableMapObserver2 = _interopRequireDefault(_ImmutableMapObserver);
 
-	var _ImmutableListObserver = __webpack_require__(5);
+	var _ImmutableListObserver = __webpack_require__(6);
 
 	var _ImmutableListObserver2 = _interopRequireDefault(_ImmutableListObserver);
 
+	var _ImmutableIndexByObserver = __webpack_require__(7);
+
+	var _ImmutableIndexByObserver2 = _interopRequireDefault(_ImmutableIndexByObserver);
+
 	exports['default'] = {
 	  Map: _ImmutableMapObserver2['default'],
-	  List: _ImmutableListObserver2['default']
+	  List: _ImmutableListObserver2['default'],
+	  IndexBy: _ImmutableIndexByObserver2['default']
 	};
 	module.exports = exports['default'];
 
@@ -101,22 +106,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _updateDeep2 = _interopRequireDefault(_updateDeep);
 
-	function mergeChanges(document, fields) {
-	  return document.withMutations(function (document) {
-	    for (var key in fields) {
-	      if (fields.hasOwnProperty(key)) {
-	        var newValue = fields[key];
-	        if (newValue === undefined) {
-	          document['delete'](key);
-	        } else {
-	          document.update(key, function (oldValue) {
-	            return _updateDeep2['default'](oldValue, _immutable2['default'].fromJS(newValue));
-	          });
-	        }
-	      }
-	    }
-	  });
-	}
+	var _mergeChanges = __webpack_require__(5);
+
+	var _mergeChanges2 = _interopRequireDefault(_mergeChanges);
 
 	function ImmutableMapObserver(cursor) {
 	  if (Tracker.active) {
@@ -143,7 +135,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    changed: function changed(id, fields) {
 	      update(_documents.update(id, function (document) {
-	        return mergeChanges(document, fields);
+	        return _mergeChanges2['default'](document, fields);
 	      }));
 	    },
 	    removed: function removed(id) {
@@ -216,6 +208,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
+	exports['default'] = mergeChanges;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _immutable = __webpack_require__(3);
+
+	var _immutable2 = _interopRequireDefault(_immutable);
+
+	var _updateDeep = __webpack_require__(4);
+
+	var _updateDeep2 = _interopRequireDefault(_updateDeep);
+
+	function mergeChanges(document, fields) {
+	  return document.withMutations(function (document) {
+	    for (var key in fields) {
+	      if (fields.hasOwnProperty(key)) {
+	        var newValue = fields[key];
+	        if (newValue === undefined) {
+	          document['delete'](key);
+	        } else {
+	          document.update(key, function (oldValue) {
+	            return _updateDeep2['default'](oldValue, _immutable2['default'].fromJS(newValue));
+	          });
+	        }
+	      }
+	    }
+	  });
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
 	exports['default'] = ImmutableListObserver;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -264,6 +294,134 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	  _documents = _immutable2['default'].List(initialDocuments);
+	  initialDocuments = undefined;
+
+	  return {
+	    documents: function documents() {
+	      dep.depend();
+	      return _documents;
+	    },
+	    stop: function stop() {
+	      handle.stop();
+	    }
+	  };
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports['default'] = ImmutableIndexByObserver;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _immutable = __webpack_require__(3);
+
+	var _immutable2 = _interopRequireDefault(_immutable);
+
+	var _updateDeep = __webpack_require__(4);
+
+	var _updateDeep2 = _interopRequireDefault(_updateDeep);
+
+	var _mergeChanges = __webpack_require__(5);
+
+	var _mergeChanges2 = _interopRequireDefault(_mergeChanges);
+
+	/**
+	 * This is like `ImmutableMapObserver`, except that instead of using a document's `_id`
+	 * for the key in the `Immutable.Map`, it uses a custom key from the `iteratee`.  This
+	 * is more efficient than calling `observer.documents().map(...)` every time something
+	 * changes, but it is a bit dangerous: when a document is being added, if its key
+	 * conflicts with an existing document's key, an `Error` will be thrown; likewise when a
+	 * document is being changed, if `iteratee` returns a different key because of the changes
+	 * that conflicts with another document's key, an `Error` will be thrown.
+	 *
+	 * @param{Mongo.Cursor}                 cursor    - the cursor to observe
+	 * @param{string|number|array|function} iteratee  - determines the keys of the documents.
+	 *    Given `document`, an instance of `Immutable.Map`:
+	 *    If `iteratee` is a string or number, uses `document.get(iteratee)` as the key.
+	 *    If `iteratee` is an array, uses `document.getIn(iteratee)` as the key.
+	 *    If `iteratee` is a function, uses `iteratee(document)` as the key.
+	 */
+
+	function ImmutableIndexByObserver(cursor, iteratee) {
+	  if (Tracker.active) {
+	    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
+	  }
+
+	  if (typeof iteratee === 'string' || typeof iteratee === 'number') {
+	    (function () {
+	      var key = iteratee;
+	      iteratee = function (document) {
+	        return document.get(key);
+	      };
+	    })();
+	  } else if (iteratee instanceof Array) {
+	    (function () {
+	      var path = iteratee;
+	      iteratee = function (document) {
+	        return document.getIn(path);
+	      };
+	    })();
+	  }
+
+	  var _documents = undefined;
+	  var dep = new Tracker.Dependency();
+
+	  function update(newDocuments) {
+	    _documents = newDocuments;
+	    dep.changed();
+	  }
+
+	  var keyMap = {};
+	  var initialDocuments = {};
+	  var handle = cursor.observeChanges({
+	    added: function added(id, fields) {
+	      fields._id = id;
+	      var document = _immutable2['default'].fromJS(fields);
+	      var key = iteratee(document);
+	      if (initialDocuments) {
+	        if (initialDocuments.hasOwnProperty(key)) {
+	          throw new Error("Key (" + key + ") for added document _id " + id + " conflicts with a pre-existing document");
+	        }
+	        initialDocuments[key] = document;
+	      } else {
+	        if (_documents.has(key)) {
+	          throw new Error("Key (" + key + ") for added document _id " + id + " conflicts with a pre-existing document");
+	        }
+	        update(_documents.set(key, document));
+	      }
+	      keyMap[id] = key;
+	    },
+	    changed: function changed(id, fields) {
+	      var key = keyMap[id];
+	      var document = _mergeChanges2['default'](_documents.get(key), fields);
+	      var newKey = iteratee(document);
+	      if (key !== newKey) {
+	        if (_documents.has(newKey)) {
+	          throw new Error("Key for document _id " + id + " has changed from " + key + " to " + newKey + ", which conflicts with a pre-existing document, because of changed fields: " + JSON.stringify(fields));
+	        }
+	        keyMap[id] = newKey;
+	        update(_documents.withMutations(function (documents) {
+	          documents['delete'](key);
+	          documents.set(newKey, document);
+	        }));
+	      } else {
+	        update(_documents.set(key, document));
+	      }
+	    },
+	    removed: function removed(id) {
+	      var key = keyMap[id];
+	      delete keyMap[id];
+	      update(_documents['delete'](key));
+	    }
+	  });
+	  _documents = _immutable2['default'].Map(initialDocuments);
 	  initialDocuments = undefined;
 
 	  return {
