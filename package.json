@@ -1,6 +1,6 @@
 {
   "name": "meteor-immutable-observer",
-  "version": "0.0.1",
+  "version": "1.0.0-beta1",
   "description": "Creates and auto-updates Immutable.js collections from Meteor Collection cursors",
   "main": "lib/index",
   "scripts": {
