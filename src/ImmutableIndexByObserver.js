@@ -1,5 +1,5 @@
+import {Tracker} from 'meteor/tracker'
 import Immutable from 'immutable';
-
 import updateDeep from './updateDeep';
 import mergeChanges from './mergeChanges';
 

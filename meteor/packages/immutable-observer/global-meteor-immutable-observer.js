@@ -66,8 +66,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.__esModule = true;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 	var _ImmutableMapObserver = __webpack_require__(2);
 
 	var _ImmutableMapObserver2 = _interopRequireDefault(_ImmutableMapObserver);
@@ -80,12 +78,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ImmutableIndexByObserver2 = _interopRequireDefault(_ImmutableIndexByObserver);
 
-	exports['default'] = {
-	  Map: _ImmutableMapObserver2['default'],
-	  List: _ImmutableListObserver2['default'],
-	  IndexBy: _ImmutableIndexByObserver2['default']
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  Map: _ImmutableMapObserver2.default,
+	  List: _ImmutableListObserver2.default,
+	  IndexBy: _ImmutableIndexByObserver2.default
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 2 */
@@ -94,9 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = ImmutableMapObserver;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.default = ImmutableMapObserver;
 
 	var _immutable = __webpack_require__(3);
 
@@ -110,12 +107,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _mergeChanges2 = _interopRequireDefault(_mergeChanges);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Tracker = Package.tracker.Tracker;
 	function ImmutableMapObserver(cursor) {
 	  if (Tracker.active) {
 	    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
 	  }
 
-	  var _documents = undefined;
+	  var _documents = void 0;
 	  var dep = new Tracker.Dependency();
 
 	  function update(newDocuments) {
@@ -128,21 +128,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    added: function added(id, fields) {
 	      fields._id = id;
 	      if (initialDocuments) {
-	        initialDocuments[id] = _immutable2['default'].fromJS(fields);
+	        initialDocuments[id] = _immutable2.default.fromJS(fields);
 	      } else {
-	        update(_documents.set(id, _immutable2['default'].fromJS(fields)));
+	        update(_documents.set(id, _immutable2.default.fromJS(fields)));
 	      }
 	    },
 	    changed: function changed(id, fields) {
 	      update(_documents.update(id, function (document) {
-	        return _mergeChanges2['default'](document, fields);
+	        return (0, _mergeChanges2.default)(document, fields);
 	      }));
 	    },
 	    removed: function removed(id) {
-	      update(_documents['delete'](id));
+	      update(_documents.delete(id));
 	    }
 	  });
-	  _documents = _immutable2['default'].Map(initialDocuments);
+	  _documents = _immutable2.default.Map(initialDocuments);
 	  initialDocuments = undefined;
 
 	  return {
@@ -155,8 +155,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	}
-
-	module.exports = exports['default'];
 
 /***/ },
 /* 3 */
@@ -171,22 +169,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = updateDeep;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.default = updateDeep;
 
 	var _immutable = __webpack_require__(3);
 
 	var _immutable2 = _interopRequireDefault(_immutable);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function updateDeep(a, b) {
-	  if (!(a instanceof _immutable2['default'].Collection) || !(b instanceof _immutable2['default'].Collection) || Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) {
+	  if (!(a instanceof _immutable2.default.Collection) || !(b instanceof _immutable2.default.Collection) || Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) {
 	    return a === b ? a : b;
 	  }
 	  return a.withMutations(function (result) {
 	    a.forEach(function (oldValue, key) {
 	      if (!b.has(key)) {
-	        result['delete'](key);
+	        result.delete(key);
 	      }
 	    });
 	    b.forEach(function (newValue, key) {
@@ -199,8 +197,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
-	module.exports = exports['default'];
-
 /***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
@@ -208,9 +204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = mergeChanges;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.default = mergeChanges;
 
 	var _immutable = __webpack_require__(3);
 
@@ -220,24 +214,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _updateDeep2 = _interopRequireDefault(_updateDeep);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function mergeChanges(document, fields) {
 	  return document.withMutations(function (document) {
 	    for (var key in fields) {
 	      if (fields.hasOwnProperty(key)) {
 	        var newValue = fields[key];
 	        if (newValue === undefined) {
-	          document['delete'](key);
+	          document.delete(key);
 	        } else {
 	          document.update(key, function (oldValue) {
-	            return _updateDeep2['default'](oldValue, _immutable2['default'].fromJS(newValue));
+	            return (0, _updateDeep2.default)(oldValue, _immutable2.default.fromJS(newValue));
 	          });
 	        }
 	      }
 	    }
 	  });
 	}
-
-	module.exports = exports['default'];
 
 /***/ },
 /* 6 */
@@ -246,9 +240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = ImmutableListObserver;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.default = ImmutableListObserver;
 
 	var _immutable = __webpack_require__(3);
 
@@ -258,12 +250,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _updateDeep2 = _interopRequireDefault(_updateDeep);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Tracker = Package.tracker.Tracker;
 	function ImmutableListObserver(cursor) {
 	  if (Tracker.active) {
 	    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
 	  }
 
-	  var _documents = undefined;
+	  var _documents = void 0;
 	  var dep = new Tracker.Dependency();
 
 	  function update(newDocuments) {
@@ -275,14 +270,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var handle = cursor.observe({
 	    addedAt: function addedAt(document, atIndex, before) {
 	      if (initialDocuments) {
-	        initialDocuments.splice(atIndex, 0, _immutable2['default'].fromJS(document));
+	        initialDocuments.splice(atIndex, 0, _immutable2.default.fromJS(document));
 	      } else {
-	        update(_documents.splice(atIndex, 0, _immutable2['default'].fromJS(document)));
+	        update(_documents.splice(atIndex, 0, _immutable2.default.fromJS(document)));
 	      }
 	    },
 	    changedAt: function changedAt(newDocument, oldDocument, atIndex) {
 	      update(_documents.update(atIndex, function (document) {
-	        return _updateDeep2['default'](document, _immutable2['default'].fromJS(newDocument));
+	        return (0, _updateDeep2.default)(document, _immutable2.default.fromJS(newDocument));
 	      }));
 	    },
 	    removedAt: function removedAt(oldDocument, atIndex) {
@@ -293,7 +288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      update(_documents.splice(fromIndex, 1).splice(toIndex, 0, movedDocument));
 	    }
 	  });
-	  _documents = _immutable2['default'].List(initialDocuments);
+	  _documents = _immutable2.default.List(initialDocuments);
 	  initialDocuments = undefined;
 
 	  return {
@@ -307,8 +302,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-	module.exports = exports['default'];
-
 /***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
@@ -316,9 +309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	exports.__esModule = true;
-	exports['default'] = ImmutableIndexByObserver;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.default = ImmutableIndexByObserver;
 
 	var _immutable = __webpack_require__(3);
 
@@ -331,6 +322,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _mergeChanges = __webpack_require__(5);
 
 	var _mergeChanges2 = _interopRequireDefault(_mergeChanges);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Tracker = Package.tracker.Tracker;
+
 
 	/**
 	 * This is like `ImmutableMapObserver`, except that instead of using a document's `_id`
@@ -348,7 +344,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *    If `iteratee` is an array, uses `document.getIn(iteratee)` as the key.
 	 *    If `iteratee` is a function, uses `iteratee(document)` as the key.
 	 */
-
 	function ImmutableIndexByObserver(cursor, iteratee) {
 	  if (Tracker.active) {
 	    throw new Error("This can't be used inside reactive computations; it could cause infinite invalidate loops");
@@ -357,20 +352,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (typeof iteratee === 'string' || typeof iteratee === 'number') {
 	    (function () {
 	      var key = iteratee;
-	      iteratee = function (document) {
+	      iteratee = function iteratee(document) {
 	        return document.get(key);
 	      };
 	    })();
 	  } else if (iteratee instanceof Array) {
 	    (function () {
 	      var path = iteratee;
-	      iteratee = function (document) {
+	      iteratee = function iteratee(document) {
 	        return document.getIn(path);
 	      };
 	    })();
 	  }
 
-	  var _documents = undefined;
+	  var _documents = void 0;
 	  var dep = new Tracker.Dependency();
 
 	  function update(newDocuments) {
@@ -383,7 +378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var handle = cursor.observeChanges({
 	    added: function added(id, fields) {
 	      fields._id = id;
-	      var document = _immutable2['default'].fromJS(fields);
+	      var document = _immutable2.default.fromJS(fields);
 	      var key = iteratee(document);
 	      if (initialDocuments) {
 	        if (initialDocuments.hasOwnProperty(key)) {
@@ -400,7 +395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    changed: function changed(id, fields) {
 	      var key = keyMap[id];
-	      var document = _mergeChanges2['default'](_documents.get(key), fields);
+	      var document = (0, _mergeChanges2.default)(_documents.get(key), fields);
 	      var newKey = iteratee(document);
 	      if (key !== newKey) {
 	        if (_documents.has(newKey)) {
@@ -408,7 +403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        keyMap[id] = newKey;
 	        update(_documents.withMutations(function (documents) {
-	          documents['delete'](key);
+	          documents.delete(key);
 	          documents.set(newKey, document);
 	        }));
 	      } else {
@@ -418,10 +413,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    removed: function removed(id) {
 	      var key = keyMap[id];
 	      delete keyMap[id];
-	      update(_documents['delete'](key));
+	      update(_documents.delete(key));
 	    }
 	  });
-	  _documents = _immutable2['default'].Map(initialDocuments);
+	  _documents = _immutable2.default.Map(initialDocuments);
 	  initialDocuments = undefined;
 
 	  return {
@@ -434,8 +429,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	}
-
-	module.exports = exports['default'];
 
 /***/ }
 /******/ ])
